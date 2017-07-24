@@ -1,0 +1,8 @@
+*.py[cod]
+nohup.out
+*.log
+*.swp
+db.sqlite3
+/env/
+/env2.7/
+.svn/

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
+<link href="/static/multiple-select/multiple-select.css" rel="stylesheet">
+<script src="/static/js/jquery.min.js" type="text/javascript"></script>
+<script src="/static/multiple-select/jquery.multiple.select.js"></script>
+<script src="/static/js/admin.js" type="text/javascript"></script>
+</head>
+<body>
+<script type="text/javascript">
+window.parent.$("#waiting_num").html({{msgnum}});
+function change_info(){
+        //alert($("#waiting_num", window.parent.document).html());
+        var args = $("#key").serialize();
+        window.location = window.location.pathname + "?" + args;
+    }
+$(document).ready(function() {
+$("#key").keydown(function(e){
+    if(e.keyCode==13){
+        change_info()
+    }
+});
+});
+</script>
+<div class="adminTable">
+<div class="infoForm">
+<section class="content-header">
+<input id="search" name="search" type="submit" style="float:right" value="搜索" class="Btn" onclick="change_info()"/><input id="key" name="key" type="text" class="form_2" style="float:right" value="{{ key }}"/>
+    <h1>{{title}}</h1>
+</section>
+</div>
+<table width="100%" border="1" cellspacing="0" cellpadding="0">
+<thead>
+  <tr>
+    <th align="left" valign="middle">id</th>
+    <th align="left" valign="middle">工单名</th>
+    <th align="left" valign="middle">申请人</th>
+    <th align="left" valign="middle">申请时间</th>
+    <th align="left" valign="middle">更新时间</th>
+    <th align="left" valign="middle">当前处理角色</th>
+    <th align="left" valign="middle">当前处理人列表</th>
+    <th align="left" valign="middle">当前锁定者</th>
+    <th align="left" valign="middle">流程状态</th>
+    <th align="center" valign="middle">操作</th>
+  </tr>
+</thead>
+<tbody>
+{% load pagination_tags %}
+{% autopaginate rets pagenum %}
+{% for ret in rets %}
+  <tr id={{ret.id}}>
+    <td align="left" valign="middle">{{ret.id}}</td>
+    <td align="left" valign="middle">{{ret.title}}</td>
+    <td align="left" valign="middle">{{ret.creator}}</td>
+    <td align="left" valign="middle">{{ret.create_time}}</td>
+    <td align="left" valign="middle">{{ ret.update_time }}</td>
+    <td align="left" valign="middle">{{role_dict|get_item:ret.cur_role_id}}</td>
+    <td align="left" valign="middle">{{ ret.cur_users }}</td>
+    <td align="left" valign="middle">{{ ret.cur_user }}</td>
+    <td align="left" valign="middle">{{ state_dict|get_item:ret.state }}</td>
+    <td align="center" valign="middle"><a href="javascript:void(0);" class="handle" onclick="openWin('{% url 'workflow:show_task' %}?id={{ ret.id}}');"><img title='查看' src="/static/img/information.png" alt="show"></a> <a href="javascript:void(0);" class="handle" onclick="openWin('{% ifequal ret.state 1 %}{% url 'workflow:add_task' %}{% else %}{% url 'workflow:edit_task' %}{% endifequal %}?id={{ ret.id}}');"><img title='处理' src="/static/img/pencil.png" alt="Edit"></a> {% ifequal ret.state 1 %}<a href="{% url 'workflow:del_task' %}?id={{ ret.id }}"><img title='撤销' src="/static/img/cross.png" alt="Delete"></a>{% endifequal %}</td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+{% paginate %}
+</div>
+</body>
+</html>

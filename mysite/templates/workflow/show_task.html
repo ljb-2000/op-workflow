@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+<style>
+ .progressBar{width:200px;height:8px;border:1px solid #98AFB7;border-radius:5px;margin-top:10px;}
+ #bar{width:0px;height:8px;border-radius:5px;background:#5EC4EA;}
+</style>
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
+<link href="/static/multiple-select/multiple-select.css" rel="stylesheet">
+<script src="/static/js/jquery.min.js" type="text/javascript"></script>
+<script src="/static/multiple-select/jquery.multiple.select.js"></script>
+<script src="/static/js/admin.js" type="text/javascript"></script>
+</head>
+<body>
+<script type="text/javascript">
+    var speed = 2000;
+    bar = setInterval(function(){
+        nowWidth = parseInt($("#bar").width());
+        //宽度要不能大于进度条的总宽度
+        if(nowWidth<200){    
+        $.getJSON("/workflow/ajax_get_log", {"id":{{task_id}}}, function(json){ 
+            barWidth = (json.task_mark_percent * 2) +"px";
+            $("#bar").css("width",barWidth);
+            $('#log').val(json.log);
+        });
+        }else{
+            //进度条读满后，停止
+            clearInterval(bar);
+        } 
+    },speed);
+$(document).ready(function() {
+    $('#submit').click(function(){
+        if(confirm("确认添加吗？")){ 
+	        var act = $("#act").val();
+	        var work_order_id = $("#work_order_id").val();
+	        var creator = $("#creator").val();
+	        //var creator_mail = $("#creator_mail").val();
+	        var reason = $("#reason").val();
+	        var cur_role_id = $("#cur_role_id").val();
+            var cur_user = $("#cur_user").children('option:selected').val();
+            var data = {};
+            data['reason'] = reason;
+            $.post("{% url 'workflow:ajax_task' %}", {"act":act, "work_order_id":work_order_id, "creator":creator, "cur_role_id":cur_role_id, "cur_user":cur_user, "data":JSON.stringify(data)}, function(json){ 
+                alert(json);
+                window.location.reload(); 
+            });
+        }
+    });
+});
+</script>
+<div class="adminTable">
+<div class="infoForm">
+<h3>申请人信息</h3>
+<label class="control-label" for="inputEmail">姓名</label>
+<input id="creator" name="creator" type="hidden" class="form_2 searchIpnutBtn" value="{{ creator }}">
+<input id="creator_name" name="creator_name" type="text" class="form_2 searchIpnutBtn" value="{{ creator_name }}" readonly="true">
+<label class="control-label" for="inputEmail">邮箱</label>
+<input id="creator_mail" name="creator_mail" type="text" class="form_2 searchIpnutBtn" value="{{ creator_mail }}" readonly="true">
+<label class="control-label" for="inputEmail">申请时间</label>
+<input id="creator_mail" name="creator_mail" type="text" class="form_2 searchIpnutBtn" value="{{ create_time }}" readonly="true">
+</div>
+</div>
+{% include template_name %}
+{% if display_log %}
+<div class="adminTable">
+<div class="infoForm">
+<h3>执行日志</h3>
+<div class="progressBar"><div id="bar" style="width:{% widthratio task_mark_percent 1 2 %}px"></div></div><br>
+<textarea id="log" name="log" cols="" rows="" class="form_7" style="width:60%;height:100px;">{{ log }}</textarea>
+</div>
+</div>
+{% endif %}
+<div class="adminTable">
+<div class="infoForm">
+<h3>流程</h3>
+START->{{work_order_flow|get_flow_names}}->{{ role_dict.0 }}->END
+</div>
+</div>
+<div class="adminTable">
+<div class="infoForm">
+<h3>处理人意见</h3>
+{% for row in task_log %}
+<label class="control-label" for="inputEmail">{{ row.create_time}}  {{ role_dict|get_item:row.role_id }}:{{ row.username }}({{ act_type_dict|get_item:row.act_type }})</label><br>
+<label class="control-label" for="inputEmail">{{ row.act_opinion }}</label><br><br>
+{% endfor %}
+</div>
+</div>
+</body>
+</html>

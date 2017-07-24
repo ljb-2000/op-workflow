@@ -1,0 +1,156 @@
+{% include 'main/base.html' %}
+<SCRIPT type="text/javascript">
+$(document).ready(function() {
+    $("#Frame_main").load(function(){
+        var mainheight = $(this).contents().find("body").height()+30;
+        if (mainheight < 850){ mainheight = 850};
+        $(this).height(mainheight);
+    }); 
+});
+
+function clickNode(treeid) {
+    $("#treeid").val(treeid);
+    modename = $("#modename").val();
+    if (modename=='dashboard') {
+        $('#modename').val('mtree/host_list');
+    }
+    changeMain();
+}
+function clickMode(modename) {
+    $("#modename").val(modename);
+    changeMain();
+}
+function changeMain() {
+    modename = $("#modename").val();
+    treeid = $("#treeid").val();
+    $.get("/updatemain", {"modename":modename,"treeid":treeid}, function(data){
+    if (data == 'ok') {
+        url = "/" + modename + "?treeid=" + treeid;
+        $('#Frame_main').attr("src",url);
+    } else {
+       window.location.reload();
+    }
+    });
+}
+</SCRIPT>
+</head>
+  <body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+
+      <header class="main-header">
+        <!-- Logo -->
+        <a href="/" class="logo">
+          <!-- mini logo for sidebar mini 50x50 pixels -->
+          <span class="logo-mini"><b>WF</b></span>
+          <!-- logo for regular state and mobile devices -->
+          <span class="logo-lg"><b>WORKFLOW</b></span>
+        </a>
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top" role="navigation">
+          <!-- Sidebar toggle button-->
+          <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+            <span class="sr-only">Toggle navigation</span>
+          </a>
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+              <!-- User Account: style can be found in dropdown.less -->
+              <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="/static/AdminLTE-2.3.0/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                  <span class="hidden-xs">{{ userzhname }}</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <!-- User image -->
+                  <li class="user-header">
+                    <img src="/static/AdminLTE-2.3.0/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    <!--
+                    <p>
+                      OP
+                      <small>管理员</small>
+                    </p>
+                    -->
+                    <p>用户名: {{ username }}</p>
+                    <p>邮箱: {{ usermail }}</p>
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                    {% if is_superuser %}
+                    <div class="pull-left">
+                      <a href="admin" class="btn btn-default btn-flat">后台中心</a>
+                    </div>
+                    {% endif %}
+                    <div class="pull-right">
+                      <a href="/logout" class="btn btn-default btn-flat">退出</a>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <!-- Control Sidebar Toggle Button -->
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <!-- Left side column. contains the logo and sidebar -->
+      <aside class="main-sidebar">
+        <!-- sidebar: style can be found in sidebar.less -->
+        <section class="sidebar">
+          <!-- sidebar menu: : style can be found in sidebar.less -->
+          <ul class="sidebar-menu">
+            <!--<li class="treeview">-->
+            <li class="treeview active">
+              <a href="#"><i class="fa fa-share"></i> <span>产品服务</span><i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <!--<ul class="treeview-menu">-->
+              <ul class="treeview-menu" style="display: block;">
+                <li>
+                    <a href="#"><i class="fa fa-circle-o"></i>工作流<i class="fa fa-angle-left pull-right"></i></a>
+                    <!--<ul class="treeview-menu">-->
+                    <ul class="treeview-menu menu-open" style="display: block;">
+                        <li><a href="#" onclick="clickMode('workflow/link_task');"><i class="fa fa-circle-o"></i>新建事项</a></li>
+                        <li><a href="#" onclick="clickMode('workflow/waiting_task');"><i class="fa fa-circle-o"></i>待办事项<span id="waiting_num" class="label label-warning pull-right">{{task_num_dict.waiting_num}}</span></a></li>
+                        <li><a href="#" onclick="clickMode('workflow/done_task');"><i class="fa fa-circle-o"></i>已办事项<span id="done_num" class="label label-success pull-right">{{task_num_dict.done_num}}</span></a></li>
+                        <li><a href="#" onclick="clickMode('workflow/sent_task');"><i class="fa fa-circle-o"></i>已发事项<span id="sent_num" class="label label-primary pull-right">{{task_num_dict.sent_num}}</span></a></li>
+                        {% if is_workflow_supervisor %}
+                        <li><a href="#" onclick="clickMode('workflow/supervisor_task');"><i class="fa fa-circle-o"></i>督办事项<span id="supervisor_num" class="label label-warning pull-right">{{task_num_dict.supervisor_num}}</span></a></li>
+                        <li><a href="#" onclick="clickMode('workflow/all_task');"><i class="fa fa-circle-o"></i>所有事项<span id="all_num" class="label label-success pull-right">{{task_num_dict.all_num}}</span></a></li>
+                        {% endif %}
+                        {% if is_workflow_admin %}
+                        <li><a href="#" onclick="clickMode('workflow/order_list');"><i class="fa fa-circle-o"></i>工作流列表</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% if is_workflow_admin %}
+               <li>
+                    <a href="#"><i class="fa fa-circle-o"></i>用户角色权限管理<i class="fa fa-angle-left pull-right"></i></a>
+                    <ul class="treeview-menu">
+                        <li><a href="#" onclick="clickMode('role_list');"><i class="fa fa-circle-o"></i>用户角色列表</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+              </ul>
+            </li>
+          <!-- search form -->
+          </ul>
+        </section>
+        <!-- /.sidebar -->
+      </aside>
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Main content -->
+        <section class="content">
+          <!-- Main row -->
+          <div class="row">
+          </div><!-- /.row (main row) -->
+          <iframe width="100%"  height="850"  style='' frameborder="0" scrolling="yes" src="/{{modename}}" id="Frame_main">
+          </iframe>
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+
+      <!-- Add the sidebar's background. This div must be placed
+           immediately after the control sidebar -->
+      <div class="control-sidebar-bg"></div>
+    </div><!-- ./wrapper -->
+<input type="hidden" id="modename" value="{{ modename }}">
+  </body>
+</html>

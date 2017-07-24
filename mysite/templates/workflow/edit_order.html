@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
+<link href="/static/multiple-select/multiple-select.css" rel="stylesheet">
+<script src="/static/js/jquery.min.js" type="text/javascript"></script>
+<script src="/static/multiple-select/jquery.multiple.select.js"></script>
+<script src="/static/js/admin.js" type="text/javascript"></script>
+</head>
+<body>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#addTable").click(function(){
+       var tr="<tr><td align=\"left\" valign=\"middle\"><select name=\"act_type\" id=\"act_type\" class=\"form_2 w300\"><option value='' selected=\"selected\">请选择角色</option>{% for role in roles %}<option value={{ role.id }}>{{ role.zh_name }}</option>{% endfor %}</select></td></tr>"
+　  　$("#table").append(tr);
+    });
+    $("#deleteTable").click(function(){
+        document.getElementById('table').deleteRow(-1);
+    });
+    $('#submit').click(function(){
+        var id = $("#id").val();
+        var act = $("#act").val();
+        var name = $("#name").val();
+        var title = $("#title").val();
+        var desc = $("#desc").val();
+        var is_active = $("input[name='is_active']:checked").val();
+        var flow = [];
+        $('table select').each(function(){
+            flow.push($(this).val()); 
+        });
+        var flow = flow.join("-");
+        $.post("{% url 'workflow:ajax_order' %}", {"act":act, "id":id, "name":name, "title":title, "desc":desc, "is_active":is_active, "flow":flow}, function(json){ 
+            alert(json);
+            window.close();
+            window.parent.opener.location.reload();
+        });
+    });
+});
+</script>
+<div class="adminTable">
+<div class="infoForm">
+<h3>{{title}}</h3>
+<input id="act" name="act" type="hidden" class="form_2 searchIpnutBtn" value="edit">
+<input id="id" name="id" type="hidden" class="form_2 searchIpnutBtn" value="{{ ret.id }}">
+<label class="control-label" for="inputEmail">工单名(英文)</label>
+<input id="name" type="text" class="form_2 searchIpnutBtn" value="{{ ret.name }}" {% if id %}readonly="true"{% endif %}><br><br>
+<label class="control-label" for="inputEmail">标题</label>
+<input id="title" type="text" class="form_2 searchIpnutBtn" value="{{ ret.title }}"><br><br>
+<label class="control-label" for="inputEmail">描述</label>
+<input id="desc" type="text" class="form_2 searchIpnutBtn" value="{{ ret.desc }}"><br><br>
+<label class="control-label" for="inputEmail">是否激活</label>
+<label> <input type="radio" {% ifequal ret.is_active 1 %}checked="checked"{% endifequal %} value="1" name="is_active">激活 </label>
+<label> <input type="radio" {% ifequal ret.is_active 0 %}checked="checked"{% endifequal %} value="0" name="is_active">禁用</label><br><br>
+<input id="addTable" type="submit" value="添加审批流程" class="Btn" />
+<input id="deleteTable" type="submit" value="删除审批流程" class="Btn" /><br><br>
+<table id="table" border="0" cellspacing="0" cellpadding="0">
+<thead>
+</thead> 
+<tbody> 
+{% for role_id in role_ids %}
+  <tr>
+    <td align="left" valign="middle">
+        <select class="form_2 w300">
+            <option value='' selected="selected">请选择角色</option>
+            {% for role in roles %}
+            <option {% ifequal role.id role_id %} selected="selected"{% endifequal %} value={{ role.id }}>{{ role.zh_name }}</option>
+            {% endfor %}
+        </select>
+    </td>
+  </tr>
+{% endfor %}
+</tbody> 
+</table><br>
+<input id="submit" type="submit" value="提交" class="Btn" />
+</div>
+<br>
+</div>
+</body>
+</html>

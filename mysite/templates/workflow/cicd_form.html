@@ -1,0 +1,42 @@
+<script type="text/javascript">
+function check_submit(){
+    var envs = $('#display_envs').html();
+    if(! envs){
+        return '请选择环境';
+    }
+}
+$(document).ready(function() {
+    $("#cicd_env").multipleSelect({
+        placeholder: "请选择环境",  
+        filter: true,    
+        onClose: function() {
+            var envs = $("#cicd_env").multipleSelect("getSelects");
+            var envs = envs.join(' ');
+            $('#display_envs').text(envs);
+        },
+    });
+});
+</script>
+<div class="adminTable">
+<div class="infoForm">
+<h3>{{ work_order_title }}</h3>
+<label class="control-label" for="inputEmail">环境列表: <span id="display_envs">{% for env in data.cicd_env %}{{env}} {% endfor %}</span></label><br><br>
+{% if display_submit %}
+<select name="cicd_env" id="cicd_env" multiple="multiple" class="form_3">
+{% for env in envs %}
+    <option>{{ env }}</option>
+{% endfor %}
+</select><br><br>
+{% if next_role_id != 0 %}
+<select name="next_user" id="next_user" class="form_2 w150">
+{% ifnotequal next_users|length 1 %}<option value='' selected="selected">请选择审批人</option>{% endifnotequal %}
+{% for user in next_users %}
+    <option{% ifequal user.username next_user %} selected="selected"{% endifequal %} value={{ user.username }}_{{ user.email }}>{{ user.username }}_{{ user.last_name }}</option>
+{% endfor %}
+</select>
+<br><br>
+{% endif %}
+<input id="submit" type="submit" value="提交" class="Btn" />
+{% endif %}
+</div>
+</div>

@@ -1,0 +1,25 @@
+yum install rabbitmq-server -y
+/etc/init.d/rabbitmq-server start
+chkconfig rabbitmq-server on
+
+pip install virtualenv
+
+virtualenv ./env
+source env/bin/activate
+pip install -r pip_requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python init.py
+sh service.sh start
+
+常见问题:
+1. django1.9使用django-pageination的错误处理
+‘WSGIRequest’ object has no attribute ‘REQUEST’
+这是因为REQUEST对象已经在Django1.9中丢弃. 进入python的lib目录，进入lib/python2.7/site-packages/pagination, 将middleware.py里的return int(self.REQUEST[‘page’])改为return int(self.GET[‘page’])
+
+2. sequence index must be integer, not ‘slice’
+这是因为xrange对象不能进行slice操作，进入templatetags,将pagination_tags.py,paginate函数里的page_range = paginator.page_range改为 page_range = list(paginator.page_range)
+很郁闷的是，django-pagination的github仓库里的程序没有更新，而且报TOKEN_BLOCK错误，估计是这个commit中引入的。
+
+

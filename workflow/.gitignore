@@ -1,0 +1,25 @@
+# virtualenv
+.venv/
+
+# Pycharm
+.idea/
+
+# Python
+*.py[co]
+# Vim
+*.swp
+# OS X
+*.DS_Store
+# sqlite3 db
+db.sqlite3
+
+# Log
+logs/
+
+# Media
+upload/
+uploads
+
+# Product setttings
+product_settings.py
+
