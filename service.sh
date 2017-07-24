@@ -30,7 +30,7 @@ start() {
              echo
         else
             source $base_dir/env/bin/activate
-            daemon python $base_dir/manage.py runserver 0.0.0.0:8008 &> $base_dir/logs/console.log 2>&1 &
+            daemon python $base_dir/manage.py runserver 0.0.0.0:8000 &> $base_dir/logs/console.log 2>&1 &
             #>$base_dir/logs/celery.log
             daemon python $base_dir/manage.py celery worker --loglevel=info &>> $base_dir/logs/celery.log 2>&1 &
             sleep 1
