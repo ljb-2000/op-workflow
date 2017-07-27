@@ -59,8 +59,8 @@ def health(request):
 @login_required
 def index(request):
     title = '运维云平台'
-    site_name = 'SALT-DEPLOY'
-    site_short_name = 'SD'
+    site_name = 'OP-Workflow'
+    site_short_name = 'WF'
     user = request.user
     username = user.username
     userzhname = user.last_name
@@ -71,7 +71,7 @@ def index(request):
         modename = request.session["modename"]
     else:
         #登录默认页为待处理工单
-        request.session['modename'] = modename = 'salt_deploy/job_list'
+        request.session['modename'] = modename = 'workflow/waiting_task'
     #workflow
     roles = get_roles_by_username(username)
     if 'op' in roles: is_op = 1
