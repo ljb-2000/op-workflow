@@ -100,7 +100,7 @@ START->{{work_order_flow|get_flow_names}}->{{ role_dict.0 }}->END
 <div class="infoForm">
 <h3>处理人意见</h3>
 {% for row in task_log %}
-<label class="control-label" for="inputEmail">{{ row.create_time}}  {{ role_dict|get_item:row.role_id }}:{{ row.username }}({{ cur_act_type_dict|get_item:row.act_type }})</label><br>
+<label class="control-label" for="inputEmail">{{ row.create_time}}  {{ role_dict|get_item:row.role_id }}:{{ row.username }}({{ act_type_dict|get_item:row.act_type }})</label><br>
 <label class="control-label" for="inputEmail">{{ row.act_opinion }}</label><br><br>
 {% endfor %}
 </div>

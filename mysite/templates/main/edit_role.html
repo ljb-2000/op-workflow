@@ -53,13 +53,13 @@ $(document).ready(function() {
 <input id="role_id" name="role_id" type="hidden" class="form_2 searchIpnutBtn" value="{{ id }}">
 <input id="act" name="act" type="hidden" class="form_2 searchIpnutBtn" value="edit">
 <label class="control-label" for="inputEmail">角色英文名</label>
-<input id="name" name="name" type="text" class="form_2 searchIpnutBtn" value="{{ ret.name }}">
+<input id="name" name="name" type="text" class="form_2 searchIpnutBtn" value="{{ ret.name }}" {% ifequal ret.flag 1 %}readonly="true"{% endifequal %}>
 <br><br>
 <label class="control-label" for="inputEmail">角色中文名</label>
-<input id="zh_name" name="zh_name" type="text" class="form_2 searchIpnutBtn" value="{{ ret.zh_name }}">
+<input id="zh_name" name="zh_name" type="text" class="form_2 searchIpnutBtn" value="{{ ret.zh_name }}" {% ifequal ret.flag 1 %}readonly="true"{% endifequal %}>
 <br><br>
 <label class="control-label" for="inputEmail">角色说明</label>
-<input id="desc" name="desc" type="text" class="form_4 searchIpnutBtn" value="{{ ret.desc }}">
+<input id="desc" name="desc" type="text" class="form_4 searchIpnutBtn" value="{{ ret.desc }}" {% ifequal ret.flag 1 %}readonly="true"{% endifequal %}>
 <br><br>
 <label class="control-label" for="inputEmail">用户</label>
 <div class="row">

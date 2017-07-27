@@ -363,6 +363,7 @@ def ajax_task(request):
                 #撤销
                 if act_type == 0: 
                     next_state = 0
+                    next_role_id = -1
                     next_users = next_user = ''
                 #同意
                 if act_type == 1: 
@@ -564,11 +565,11 @@ def edit_task(request):
         create_time = ret.create_time
         task_log = Task_log.objects.filter(task_id=task_id).order_by('-create_time')
         role_dict = get_role_name()
-        cur_act_type_dict = settings.ACT_TYPE_DICT
+        act_type_dict = cur_act_type_dict = settings.ACT_TYPE_DICT
         #如果工单处理状态为申请人确认处理意见的选项只有确认和撤销
         if state == 4: cur_act_type_dict = settings.CREATOR_ACT_TYPE_DICT
         #工单执行日志文件如果存在则显示执行日志
-        log_file = '%s/logs/workflow/%d' % (settings.BASE_DIR, task_id)
+        log_file = '%s/logs/workflow/%d.log' % (settings.BASE_DIR, task_id)
         if os.path.exists(log_file): 
             display_log = 1
             f = open(log_file)
@@ -592,7 +593,7 @@ def ajax_get_log(request):
         log = '获取日志的参数错误'
     else:
         task_id = int(task_id)
-        log_file = '%s/logs/workflow/%d' % (settings.BASE_DIR, task_id)
+        log_file = '%s/logs/workflow/%d.log' % (settings.BASE_DIR, task_id)
         if os.path.exists(log_file):
             f = open(log_file)
             log = f.read()

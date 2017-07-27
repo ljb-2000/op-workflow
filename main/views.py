@@ -11,9 +11,9 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.template.defaulttags import register
-from mysite.comm import *
-from workflow.models import Task, Task_log, Work_order
 from django.conf import settings
+from workflow.models import Task, Task_log, Work_order
+from mysite.comm import *
 from .models import *
 
 reload(sys)
@@ -58,6 +58,9 @@ def health(request):
 
 @login_required
 def index(request):
+    title = '运维云平台'
+    site_name = 'SALT-DEPLOY'
+    site_short_name = 'SD'
     user = request.user
     username = user.username
     userzhname = user.last_name
@@ -68,13 +71,14 @@ def index(request):
         modename = request.session["modename"]
     else:
         #登录默认页为待处理工单
-        request.session['modename'] = modename = 'workflow/waiting_task'
+        request.session['modename'] = modename = 'salt_deploy/job_list'
     #workflow
     roles = get_roles_by_username(username)
+    if 'op' in roles: is_op = 1
+    if 'user_role_admin' in roles: is_user_role_amin = 1
     if 'workflow_admin' in roles: is_workflow_admin = 1
     if 'workflow_supervisor' in roles: is_workflow_supervisor = 1
-    if 'superuser' in roles: is_workflow_admin = is_workflow_supervisor = is_ldap_admin = 1
-    if 'op' in roles: is_op = 1
+    if 'superuser' in roles: is_user_role_admin = is_workflow_admin = is_workflow_supervisor = is_op = 1
     task_num_dict = {}
     task_id_list = [ row.task_id for row in Task_log.objects.filter(username=username).distinct()]
     task_num_dict['done_num'] = Task.objects.filter(id__in=task_id_list).count()
@@ -114,14 +118,14 @@ def updatemain(request):
 
 #role
 @login_required
-@require_role(role_list=['superuser'])
+@require_role(role_list=['user_role_admin', 'superuser'])
 def add_role(request):
     title = '添加角色'
     users = User.objects.all()
     return render_to_response('main/add_role.html', locals())
 
 @login_required
-@require_role(role_list=['superuser'])
+@require_role(role_list=['user_role_admin', 'superuser'])
 def edit_role(request):
     title = '编辑角色'
     id = request.GET.get('id').strip()
@@ -133,7 +137,7 @@ def edit_role(request):
     return render_to_response('main/edit_role.html', locals())
 
 @login_required
-@require_role(role_list=['superuser'])
+@require_role(role_list=['user_role_admin', 'superuser'])
 def role_list(request):
     title = '系统角色列表'
     key = request.GET.get('key','').strip()
@@ -145,7 +149,7 @@ def role_list(request):
     return render_to_response('main/role_list.html',locals())
 
 @login_required
-@require_role(role_list=['superuser'])
+@require_role(role_list=['user_role_admin', 'superuser'])
 def ajax_role(request):
     user = request.user
     ret = False
@@ -164,12 +168,8 @@ def ajax_role(request):
             role_obj.users.add(*user_obj)
             if ret: ret = '添加成功'
         elif act == 'del':
-            #workflow中的审批角色不能删除
-            if Work_order.objects.filter(Q(flow=role_id)|Q(flow__contains='-%s-' % role_id)|Q(flow__startswith='%s-' % role_id)|Q(flow__endswith='-%s' % role_id)) or Task.objects.filter(Q(flow=role_id)|Q(flow__contains='-%s-' % role_id)|Q(flow__startswith='%s-' % role_id)|Q(flow__endswith='-%s' % role_id)):
-                ret = '该角色在workflow中已使用，不能删除'
-            else:
-                ret = Role.objects.filter(id=role_id).delete()
-                if ret: ret = '删除成功'
+            ret = Role.objects.filter(id=role_id,flag=0).delete()
+            if ret: ret = '删除成功'
         elif act == 'edit':
             user_list = users.split(',')
             user_obj = User.objects.filter(username__in=user_list)

@@ -58,11 +58,11 @@ $("#key").keydown(function(e){
     <td align="left" valign="middle">{{ret.id}}</td>
     <td align="left" valign="middle">{{ret.name}}</td>
     <td align="left" valign="middle">{{ret.zh_name}}</td>
-    <td align="left" valign="middle">{{ ret.desc }}</td>
-    <td align="left" valign="middle">{{ ret.creator }}</td>
+    <td align="left" valign="middle">{{ret.desc}}</td>
+    <td align="left" valign="middle">{{ret.creator}}</td>
     <td align="left" valign="middle">{{ret.create_time}}</td>
-    <td align="left" valign="middle">{{ ret.update_time }}</td>
-    <td align="center" valign="middle"><a href="javascript:void(0);" class="handle" onclick="openWin('/edit_role?id={{ ret.id}}');"><img title='处理' src="/static/img/pencil.png" alt="Edit"></a>{% ifnotequal ret.name 'workflow_admin' %}{% ifnotequal ret.name 'workflow_supervisor' %}<a href="javascript:void(0);" class="handle" onclick="if(confirm('确实要删除吗?'))del_role('{{ ret.id }}');"><img title='删除' src="/static/img/cross.png" alt="Delete"></a>{% endifnotequal %}{% endifnotequal %}</td>
+    <td align="left" valign="middle">{{ret.update_time}}</td>
+    <td align="center" valign="middle"><a href="javascript:void(0);" class="handle" onclick="openWin('/edit_role?id={{ ret.id}}');"><img title='处理' src="/static/img/pencil.png" alt="Edit"></a>{% ifequal ret.flag 0 %}<a href="javascript:void(0);" class="handle" onclick="if(confirm('确实要删除吗?'))del_role('{{ ret.id }}');"><img title='删除' src="/static/img/cross.png" alt="Delete"></a>{% endifequal %}</td>
   </tr>
 {% endfor %}
 </tbody>
